@@ -1,0 +1,39 @@
+{
+  "students": {
+    "collection_name_prefix": "students",
+    "description": "Information about enrolled students, including names, course, year, and guardian details.",
+    "filterable_fields": {
+      "course": {
+        "type": "exact_match",
+        "normalization": "uppercase"
+      },
+      "year_level": {
+        "type": "exact_match",
+        "normalization": "integer"
+      },
+      "section": {
+        "type": "exact_match",
+        "normalization": "uppercase"
+      },
+      "name": {
+        "type": "contains_match"
+      }
+    }
+  },
+  "faculty": {
+    "collection_name_prefix": "faculty",
+    "description": "Profiles, resumes, and contact information for teachers and professors.",
+    "filterable_fields": {
+      "department": {
+        "type": "exact_match",
+        "normalization": "uppercase"
+      },
+      "name": {
+        "type": "contains_match"
+      },
+      "specialization": {
+        "type": "contains_match"
+      }
+    }
+  }
+}
