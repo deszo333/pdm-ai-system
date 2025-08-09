@@ -52,12 +52,13 @@ def call_llm(prompt_text, sds):
         except Exception as e:
             return f"Error: Offline model call failed. Is Ollama running? Details: {e}"
 
-def extract_filters_from_query(query, sds):
+def extract_filters_from_query(query, sds): # Added sds for debug mode access
     """
-    Asks the AI to perform a simple extraction of key-value pairs.
-    Now uses the universal call_llm function.
+    Asks the AI to perform a simple extraction of key-value pairs without any complex logic.
+    This version has the corrected rule for year_level.
     """
     possible_fields = ["year_level", "course", "section", "name"]
+     
     prompt = f"""
     You are an entity extraction assistant. Your task is to extract information from the user's query into a simple JSON object.
 
@@ -65,11 +66,17 @@ def extract_filters_from_query(query, sds):
 
     **Rules:**
     - If you see a course, year, or section, extract it.
+    - **CRITICAL:** For "year_level", you MUST extract only the integer number (e.g., "3rd year" becomes 3, "second year" becomes 2).
     - If you see something that looks like a person's name (one or more words), extract the entire name string into the "name" key.
     - Convert all values to lowercase, except for course codes (e.g., "BSCS").
 
+    **Example 1:** "3rd year bscs student" -> {{"course": "BSCS", "year_level": 3}}
+    **Example 2:** "who is taylor chase" -> {{"name": "taylor chase"}}
+    **Example 3:** "3rd year student named kim" -> {{"year_level": 3, "name": "kim"}}
+
     Query: "{query}"
     """
+     
     response_content = call_llm(prompt, sds)
     try:
         start_index = response_content.find('{')
@@ -78,7 +85,7 @@ def extract_filters_from_query(query, sds):
             json_string = response_content[start_index : end_index + 1]
             filters = json.loads(json_string)
         else:
-            raise ValueError("No valid JSON object found in the AI response.")
+            raise ValueError("No valid JSON object found in the API response.")
 
         if sds.debug_mode:
             print("\n🔍 Parsed Filters from Mistral (Simple Format):")
